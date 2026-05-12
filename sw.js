@@ -1,4 +1,4 @@
-const CACHE = 'iterator_v1.2';
+const CACHE = 'iterator_v1.3';
 
 const ASSETS = [
     './',
@@ -34,12 +34,19 @@ const ASSETS = [
     'https://cdn.jsdelivr.net/gh/virtuan4-max/iterator@main/assets/audio/NA_41_-_Random_Gods_(Theme_III).mp3',
 ];
 
-// On install: cache everything
+// On install: cache everything, but don't let a single failure abort the whole install
 self.addEventListener('install', event => {
     event.waitUntil(
-        caches.open(CACHE).then(cache => cache.addAll(ASSETS))
+        caches.open(CACHE).then(cache =>
+            Promise.allSettled(
+                ASSETS.map(url =>
+                    cache.add(url).catch(err =>
+                        console.warn('[SW] Failed to cache:', url, err)
+                    )
+                )
+            )
+        ).then(() => self.skipWaiting())
     );
-    self.skipWaiting();
 });
 
 // On activate: drop old caches
