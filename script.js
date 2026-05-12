@@ -1,27 +1,10 @@
 // --- Audio ---
-// Use fetch() so requests go through the Service Worker cache.
-// new Audio(url) bypasses the SW, causing failures when offline.
-function makeAudio(url) {
-    const el = new Audio();
-    fetch(url)
-        .then(r => r.blob())
-        .then(blob => { el.src = URL.createObjectURL(blob); })
-        .catch(() => { el.src = url; }); // fallback: try direct if fetch somehow fails
-    return el;
-}
-
-const rain       = makeAudio('https://cdn.jsdelivr.net/gh/virtuan4-max/iterator@main/assets/audio/rain.wav');
-const enterclick = makeAudio('https://cdn.jsdelivr.net/gh/virtuan4-max/iterator@main/assets/audio/UI_UIArp.wav');
-const clickhigh  = makeAudio('https://cdn.jsdelivr.net/gh/virtuan4-max/iterator@main/assets/audio/UI_UIMetal1.wav');
-const randomgods = makeAudio('https://cdn.jsdelivr.net/gh/virtuan4-max/iterator@main/assets/audio/NA_41_-_Random_Gods_(Theme_III).mp3');
+const rain = new Audio('https://cdn.jsdelivr.net/gh/virtuan4-max/iterator@main/assets/audio/rain.wav');
+const enterclick = new Audio('https://cdn.jsdelivr.net/gh/virtuan4-max/iterator@main/assets/audio/UI_UIArp.wav');
+const clickhigh = new Audio('https://cdn.jsdelivr.net/gh/virtuan4-max/iterator@main/assets/audio/UI_UIMetal1.wav');
+const randomgods = new Audio('https://cdn.jsdelivr.net/gh/virtuan4-max/iterator@main/assets/audio/NA_41_-_Random_Gods_(Theme_III).mp3');
 const sounds = [enterclick, clickhigh];
 const music = [randomgods]
-
-// Suppress NotSupportedError (audio not loaded yet) and NotAllowedError (autoplay policy)
-function safePlay(audio) {
-    if (!audio.src) return;
-    audio.play().catch(() => {});
-}
 
 rain.loop = true;
 rain.volume = 0;
@@ -554,11 +537,11 @@ document.addEventListener('click', (e) => {
     //intro
     if (!introPlayed) {
         introPlayed = true;
-        safePlay(enterclick);
+        enterclick.play();
     
         introclick.classList.add('fade');
         introclick.addEventListener('transitionend', () => introclick.remove());
-        safePlay(rain)
+        rain.play()
         if (firstvisit || introplay == true) {
             introSequence();
         }
@@ -671,7 +654,7 @@ function updateVolume() {
 
 function playhighclick() {
     clickhigh.currentTime = 0;
-    safePlay(clickhigh);  
+    clickhigh.play();  
 }
 //intro
 function entermaincontent() {
@@ -693,7 +676,7 @@ function entermaincontent() {
         });
     }
     randomgods.volume = 0;
-    safePlay(randomgods);
+    randomgods.play();
     if (introplay == true) {
         fadevolume(rain, 1 * audiovol, 0, 3000, () => rain.pause());
     }
